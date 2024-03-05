@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+
+<style>
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 9999;
+    }
+
+    .modal-content {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: white;
+        padding: 20px;
+        border-radius: 5px;
+    }
+
+    button {
+        padding: 10px 20px;
+        border: none;
+        background-color: #007bff;
+        color: white;
+        cursor: pointer;
+    }
+</style>
+
+<style>
+    .tab {
+        display: none;
+    }
+</style>
+
+<style>
+    .arena {
+        position: relative;
+        width: 100%;
+        height: 800px;
+        background-color: burlywood;
+        border: 1px solid #000; /* Colore del bordo: nero (puoi cambiarlo secondo le tue preferenze) */
+    }
+
+    .sprite {
+        position: absolute;
+    }
+
+    table {
+        width: 100%;
+        border: 1px solid #000; /* Colore del bordo: nero (puoi cambiarlo secondo le tue preferenze) */
+        border-collapse: collapse;
+        margin-bottom: 5px;
+    }
+
+    th, td {
+        border: 0px solid #000; /* Colore del bordo delle celle */
+        padding: 5px;
+        text-align: left; /* Allineamento del testo nelle celle (puoi cambiarlo secondo le tue preferenze) */
+    }
+</style>
+
+<style>
+    .titolo {
+        font-size: 35px;
+        display: inline-block;
+        padding: 5px 10px;
+        border-radius: 5px; /* Bordo arrotondato */
+        background-color: black; /* Sfondo celeste */
+        color: white;
+        cursor: pointer; /* Cambia il cursore al passaggio sopra */
+    }
+
+    .pulsante {
+        text-decoration: none;
+        display: inline-block;
+        padding: 5px 10px;
+        border-radius: 5px; /* Bordo arrotondato */
+        background-color: darkblue; /* Sfondo celeste */
+        color: white;
+        cursor: pointer; /* Cambia il cursore al passaggio sopra */
+    }
+
+    .etichetta {
+        display: inline-block;
+        padding: 5px 10px;
+        border-radius: 5px; /* Bordo arrotondato */
+        background-color: #3498db; /* Sfondo celeste */
+        color: lightcyan;
+        cursor: pointer; /* Cambia il cursore al passaggio sopra */
+    }
+
+        .etichetta span {
+            font-weight: bold; /* Rendi il testo in grassetto */
+            color: #fff;
+            margin: 5px;
+        }
+
+    .etichettaCarta {
+        display: inline-block;
+        padding: 5px 10px;
+        border-radius: 5px; /* Bordo arrotondato */
+        background-color: burlywood; /* Sfondo celeste */
+        color: gray;
+        cursor: pointer; /* Cambia il cursore al passaggio sopra */
+    }
+
+        .etichettaCarta span {
+            font-weight: bold; /* Rendi il testo in grassetto */
+            color: black;
+            margin: 5px;
+        }
+</style>
+
+<script>
+    var modal = null;
+    var closeBtn = null;
+
+    //VARIABILI
+    var GLOBAL_STATUS = "";
+    var intervalloInMillisecondi = 100;
+
+    var punti = 0;
+
+    var cittadini = [];
+
+    var nomi = [
+        "Dish",
+        "Feature",
+        "Dynamic",
+        "Range",
+        "Unit",
+        "Nimble",
+        "Banks",
+        "Night",
+        "Bold",
+        "Zigzag",
+        "Spark",
+        "Habit",
+        "Bribe",
+        "Dynamo",
+        "Dish",
+        "Iron",
+        "Feedback",
+        "Spark",
+        "Charge",
+        "Nova",
+        "Art",
+        "Block",
+        "Parcel",
+        "Aura",
+        "Bolt",
+        "Beetle",
+        "Nimble",
+        "Hook",
+        "Fickle",
+        "Ward"
+    ];
+
+    var cittadini = [];
+
+    function GeneraGUID() {
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+            var r = Math.random() * 16 | 0,
+                v = c == 'x' ? r : (r & 0x3 | 0x8);
+            return v.toString(16);
+        });
+    }
+
+
+    function RimuoviTutto() {
+        var pacElements = document.querySelectorAll('[tipologia^="pac"]');
+        pacElements.forEach(function (element) {
+            element.parentNode.removeChild(element);
+        });
+
+        var pillElements = document.querySelectorAll('[tipologia^="pill"]');
+        pillElements.forEach(function (element) {
+            element.parentNode.removeChild(element);
+        });
+
+        var ghostElements = document.querySelectorAll('[tipologia^="ghost"]');
+        ghostElements.forEach(function (element) {
+            element.parentNode.removeChild(element);
+        });
+    }
+
+    function ResetGame() {
+        punti = 0;
+
+        RimuoviTutto();
+
+        for (let i = 0; i < NumeroCasuale(2, 5); i++) {
+            AggiungiSprite(GeneraGUID(), "pill_ghost");
+        }
+
+        for (let i = 0; i < NumeroCasuale(2, 5); i++) {
+            AggiungiSprite(GeneraGUID(), "pill_pill");
+        }
+
+        for (let i = 0; i < NumeroCasuale(2, 5); i++) {
+            AggiungiSprite(GeneraGUID(), "pill_double");
+        }
+
+        for (let i = 0; i < NumeroCasuale(2, 5); i++) {
+            AggiungiSprite(GeneraGUID(), "pill_rage");
+        }
+
+        //for (let i = 0; i < NumeroCasuale(1, 3); i++) {
+        //    AggiungiSprite(GeneraGUID(), "pill_freeze");
+        //}
+
+        //dimensioni del contenitore (ARENA)
+        var rect = arena.getBoundingClientRect();
+        var centerX = rect.left + rect.width / 2;
+        var centerY = rect.top + rect.height / 2;
+
+        var xMin = rect.left;
+        var xMax = rect.width - 50;
+        var yMin = rect.top;
+        var yMax = rect.height - 50;
+
+        AggiungiSprite(GeneraGUID(), "ghost_blinky", 0, 0);
+        AggiungiSprite(GeneraGUID(), "ghost_pinky", 0, yMax);
+        AggiungiSprite(GeneraGUID(), "ghost_inky", xMax, 0);
+        AggiungiSprite(GeneraGUID(), "ghost_clyde", xMax, yMax);
+
+        AggiungiSprite(GeneraGUID(), "pac", centerX, centerY);
+
+        GLOBAL_STATUS = "game";
+
+        var intervalID = setInterval(function () {
+            AzioneGioco(intervalID);
+        }, intervalloInMillisecondi);
+    }
+
+    function NumeroCasuale(numeroIniziale, numeroFinale) {
+        return Math.floor(Math.random() * numeroFinale) + numeroIniziale;
+    }
+
+    function CaricaDropdownList(myControl, myArray) {
+        var dropdownlist = document.getElementById(myControl);
+
+        //reset
+        var i, L = dropdownlist.options.length - 1;
+        for (i = L; i >= 0; i--) {
+            dropdownlist.remove(i);
+        }
+
+        //load
+        var el = document.createElement("option");
+        el.textContent = "[seleziona]";
+        el.value = "";
+        dropdownlist.appendChild(el);
+        for (var i = 0; i < myArray.length; i++) {
+            var opt = myArray[i];
+            var el = document.createElement("option");
+            el.textContent = opt;
+            el.value = opt;
+            dropdownlist.appendChild(el);
+        }
+    }
+
+
+    // Funzione per visualizzare il contenuto del tab selezionato
+    function mostraTab(tabId) {
+        // Nascondi tutti i tab
+        var tabs = document.querySelectorAll('.tab');
+        tabs.forEach(function (tab) {
+            tab.style.display = 'none';
+        });
+        // Mostra solo il tab selezionato
+        document.getElementById(tabId).style.display = 'block';
+
+        if (tabId == "agenda") {
+            VisualizzaImmagine("citizens");
+        }
+        else {
+            VisualizzaImmagine("city");
+        }
+    }
+
+    function CercaCittadino(idDaCercare) {
+        for (var i = 0; i < cittadini.length; i++) {
+            if (cittadini[i].id === idDaCercare) {
+                return cittadini[i];
+            }
+        }
+
+        return null;
+    }
+
+    function DettaglioCittadino(id) {
+        var cittadino = CercaCittadino(id);
+        console.log(cittadino.nome + " " + cittadino.cognome);
+    }
+
+    function RilevaCollisioneGhost(id) {
+        var sprite = document.getElementById(id);
+
+        if (sprite) {
+            var spriteRect = sprite.getBoundingClientRect();
+
+            var pacs = document.querySelectorAll('img.sprite[tipologia="pac"]');
+
+            pacs.forEach(function (pac) {
+                var pacRect = pac.getBoundingClientRect();
+
+                //COLLISIONE
+                if (spriteRect.right > pacRect.left && spriteRect.left < pacRect.right && spriteRect.bottom > pacRect.top && spriteRect.top < pacRect.bottom) {
+
+                    var elementoDaRimuovere = document.getElementById(pac.id);
+                    TrasformaInPacFroze(elementoDaRimuovere.id);
+                    //if (elementoDaRimuovere && elementoDaRimuovere.parentNode) {
+                    //    elementoDaRimuovere.parentNode.removeChild(elementoDaRimuovere);
+                    //}
+
+                    return;
+                }
+            });
+
+            var pillole = document.querySelectorAll('img.sprite[tipologia^="pill"]');
+
+            pillole.forEach(function (pillola) {
+                var pillolaRect = pillola.getBoundingClientRect();
+
+                //COLLISIONE
+                if (spriteRect.right > pillolaRect.left && spriteRect.left < pillolaRect.right && spriteRect.bottom > pillolaRect.top && spriteRect.top < pillolaRect.bottom) {
+
+                    var elementoDaRimuovere = document.getElementById(pillola.id);
+                    if (elementoDaRimuovere && elementoDaRimuovere.parentNode) {
+                        elementoDaRimuovere.parentNode.removeChild(elementoDaRimuovere);
+                    }
+                    return;
+                }
+            });
+
+        }
+    }
+
+    function TrasformaInPacFroze(id) {
+        var sprite = document.getElementById(id);
+        sprite.setAttribute("tipologia", "pac_froze");
+        sprite.setAttribute("maxPasso", "25");
+        sprite.setAttribute("direzione", "S");
+        sprite.width = "50";
+        RefreshImmagineSprite(id);
+    }
+
+    function TrasformaInPacRage(id) {
+        var sprite = document.getElementById(id);
+        sprite.setAttribute("tipologia", "pac_rage");
+        sprite.setAttribute("maxPasso", "30");
+        sprite.width = "50";
+        RefreshImmagineSprite(id);
+    }
+
+    function TrasformaInPac(id) {
+        var sprite = document.getElementById(id);
+        sprite.setAttribute("tipologia", "pac");
+        sprite.setAttribute("maxPasso", "10");
+        sprite.width = "50";
+        RefreshImmagineSprite(id);
+    }
+
+    function RilevaCollisionePac(id) {
+        var sprite = document.getElementById(id);
+
+        if (sprite) {
+            var tipologiaChiamante = sprite.getAttribute("tipologia");
+
+            if (sprite) {
+                var spriteRect = sprite.getBoundingClientRect();
+
+                var pillole = document.querySelectorAll('img.sprite[tipologia^="pill"]');
+
+                pillole.forEach(function (pillola) {
+                    var pillolaRect = pillola.getBoundingClientRect();
+
+                    //COLLISIONE
+                    if (spriteRect.right > pillolaRect.left && spriteRect.left < pillolaRect.right && spriteRect.bottom > pillolaRect.top && spriteRect.top < pillolaRect.bottom) {
+
+                        var tipologia = pillola.getAttribute("tipologia");
+
+                        if (tipologia == "pill_pill") {
+                            CreaUnaPillola();
+                            CreaUnaPillola();
+                            CreaUnaPillola();
+                            CreaUnaPillola();
+                            CreaUnaPillola();
+                            punti = punti + 100;
+                        }
+                        if (tipologia == "pill_double") {
+                            AggiungiSprite(GeneraGUID(), tipologiaChiamante, spriteRect.left, spriteRect.top);
+                            punti = punti + 100;
+                            AggiungiSprite(GeneraGUID(), tipologiaChiamante, spriteRect.left, spriteRect.top);
+                            punti = punti + 100;
+                        }
+                        if (tipologia == "pill_rage") {
+                            TrasformaInPacRage(sprite.id);
+                            AggiungiSprite(GeneraGUID(), "pill_rage");
+                            punti = punti + 100;
+                        }
+                        if (tipologia == "pill_freeze") {
+                            TrasformaInPacFroze(sprite.id);
+                        }
+                        if (tipologia == "pill_ghost") {
+                            CreaUnFantasma();
+                            CreaUnFantasma();
+                        }
+
+                        CreaUnaPillola();
+                        CreaUnaPillola();
+
+                        var elementoDaRimuovere = document.getElementById(pillola.id);
+                        if (elementoDaRimuovere && elementoDaRimuovere.parentNode) {
+                            elementoDaRimuovere.parentNode.removeChild(elementoDaRimuovere);
+                        }
+
+                        return;
+                    }
+                });
+            }
+        }
+    }
+
+    function RilevaCollisionePacRage(id) {
+        var sprite = document.getElementById(id);
+        var spriteRect = sprite.getBoundingClientRect();
+
+        var fantasmi = document.querySelectorAll('img.sprite[tipologia^="ghost"]');
+
+        fantasmi.forEach(function (fantasma) {
+            var fantasmalaRect = fantasma.getBoundingClientRect();
+
+            //COLLISIONE
+            if (spriteRect.right > fantasmalaRect.left && spriteRect.left < fantasmalaRect.right && spriteRect.bottom > fantasmalaRect.top && spriteRect.top < fantasmalaRect.bottom) {
+
+                var elementoDaRimuovere = document.getElementById(fantasma.id);
+                if (elementoDaRimuovere && elementoDaRimuovere.parentNode) {
+                    elementoDaRimuovere.parentNode.removeChild(elementoDaRimuovere);
+                }
+
+                TrasformaInPac(sprite.id);
+                punti = punti + 1000;
+
+                return;
+            }
+        });
+
+    }
+
+    function CheckOutOfBounds(id) {
+        var sprite = document.getElementById(id);
+
+        //contenitore (ARENA)
+        var rect = arena.getBoundingClientRect();
+        var centerX = rect.left + rect.width / 2;
+        var centerY = rect.top + rect.height / 2;
+        var xMin = rect.left;
+        var xMax = rect.width - 50;
+        var yMin = rect.top;
+        var yMax = rect.height - 50;
+
+        if (parseInt(sprite.style.top.replace("px", "")) >= parseInt(yMax)) {
+            if (sprite && sprite.parentNode) {
+                sprite.parentNode.removeChild(sprite);
+            }
+        }
+    }
+
+    function FuggiDaFantasmi() {
+
+    }
+
+    function AvvicinatiAllObiettivo(id, tipologiaObiettivo, singoloObiettivo) {
+        var cacciatore = document.getElementById(id);
+
+        if (cacciatore) {
+            var obiettivi = "";
+            if (singoloObiettivo == true) {
+                obiettivi = document.querySelectorAll('img[tipologia="' + tipologiaObiettivo + '"]');
+            }
+            else {
+                obiettivi = document.querySelectorAll('img[tipologia^="' + tipologiaObiettivo + '"]');
+            }
+
+            var minDistance = Number.MAX_SAFE_INTEGER;
+            var pacPiuVicino;
+
+            var myElementRect = cacciatore.getBoundingClientRect();
+            var myElementCenterX = myElementRect.left + myElementRect.width / 2;
+            var myElementCenterY = myElementRect.top + myElementRect.height / 2;
+
+            obiettivi.forEach(function (img) {
+                var rect = img.getBoundingClientRect();
+                var centerX = rect.left + rect.width / 2;
+                var centerY = rect.top + rect.height / 2;
+                var distance = Math.sqrt(Math.pow(centerX - myElementCenterX, 2) + Math.pow(centerY - myElementCenterY, 2));
+
+                // Se l'elemento img è più vicino dell'attuale più vicino, aggiorna le informazioni
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    pacPiuVicino = img;
+                }
+            });
+
+            if (pacPiuVicino) {
+                var nearestImgRect = pacPiuVicino.getBoundingClientRect();
+
+                var nearestImgCenterX = nearestImgRect.left + nearestImgRect.width / 2;
+                var nearestImgCenterY = nearestImgRect.top + nearestImgRect.height / 2;
+
+                var nuovaPosizioneX = parseInt(cacciatore.style.left);
+                var nuovaPosizioneY = parseInt(cacciatore.style.top);
+                var passo = NumeroCasuale(5, parseInt(cacciatore.getAttribute("maxPasso")));
+
+                // Calcola la nuova posizione per l'elemento cacciatore
+                if (parseInt(cacciatore.style.left) < parseInt(pacPiuVicino.style.left)) {
+                    nuovaPosizioneX = nuovaPosizioneX + passo;
+                    cacciatore.setAttribute("direzione", "E");
+                    RefreshImmagineSprite(cacciatore.id);
+                }
+                if (parseInt(cacciatore.style.left) > parseInt(pacPiuVicino.style.left)) {
+                    nuovaPosizioneX = nuovaPosizioneX - passo;
+                    cacciatore.setAttribute("direzione", "O");
+                    RefreshImmagineSprite(cacciatore.id);
+                }
+                if (parseInt(cacciatore.style.top) < parseInt(pacPiuVicino.style.top)) {
+                    nuovaPosizioneY = nuovaPosizioneY + passo;
+                    cacciatore.setAttribute("direzione", "S");
+                    RefreshImmagineSprite(cacciatore.id);
+                }
+                if (parseInt(cacciatore.style.top) > parseInt(pacPiuVicino.style.top)) {
+                    nuovaPosizioneY = nuovaPosizioneY - passo;
+                    cacciatore.setAttribute("direzione", "N");
+                    RefreshImmagineSprite(cacciatore.id);
+                }
+
+                SpostaSprite(cacciatore.id, nuovaPosizioneX, nuovaPosizioneY);
+            }
+        }
+    }
+
+    function AllontanatiDallaMinaccia(id, tipologiaObiettivo, singoloObiettivo) {
+        var preda = document.getElementById(id);
+
+        var obiettivi = "";
+        if (singoloObiettivo == true) {
+            obiettivi = document.querySelectorAll('img[tipologia="' + tipologiaObiettivo + '"]');
+        }
+        else {
+            obiettivi = document.querySelectorAll('img[tipologia^="' + tipologiaObiettivo + '"]');
+        }
+
+        var minDistance = Number.MAX_SAFE_INTEGER; // Impostiamo la distanza minima su un valore massimo
+        var minacciaPiuVicina;
+
+        var myElementRect = preda.getBoundingClientRect();
+        var myElementCenterX = myElementRect.left + myElementRect.width / 2;
+        var myElementCenterY = myElementRect.top + myElementRect.height / 2;
+
+        obiettivi.forEach(function (img) {
+            var rect = img.getBoundingClientRect();
+            var centerX = rect.left + rect.width / 2;
+            var centerY = rect.top + rect.height / 2;
+            var distance = Math.sqrt(Math.pow(centerX - myElementCenterX, 2) + Math.pow(centerY - myElementCenterY, 2));
+
+            // Se la distanza è inferiore a 200px, aggiorna le informazioni sull'elemento più vicino
+            if (distance < 200 && distance < minDistance) {
+                minDistance = distance;
+                minacciaPiuVicina = img;
+            }
+        });
+
+        if (minacciaPiuVicina) {
+            var nearestImgRect = minacciaPiuVicina.getBoundingClientRect();
+
+            var nearestImgCenterX = nearestImgRect.left + nearestImgRect.width / 2;
+            var nearestImgCenterY = nearestImgRect.top + nearestImgRect.height / 2;
+
+            var nuovaPosizioneX = parseInt(preda.style.left);
+            var nuovaPosizioneY = parseInt(preda.style.top);
+            var passo = NumeroCasuale(5, parseInt(preda.getAttribute("maxPasso")));
+
+            // Calcola la nuova posizione per l'elemento preda solo se la distanza è inferiore a 200px
+            if (minDistance < 200) {
+                // Calcola la nuova posizione solo se la distanza è inferiore a 200px
+                if (parseInt(preda.style.left) < parseInt(minacciaPiuVicina.style.left)) {
+                    nuovaPosizioneX = nuovaPosizioneX - passo; // Si allontana invece di avvicinarsi
+                    preda.setAttribute("direzione", "O");
+                    RefreshImmagineSprite(preda.id);
+                }
+                if (parseInt(preda.style.left) > parseInt(minacciaPiuVicina.style.left)) {
+                    nuovaPosizioneX = nuovaPosizioneX + passo; // Si allontana invece di avvicinarsi
+                    preda.setAttribute("direzione", "E");
+                    RefreshImmagineSprite(preda.id);
+                }
+                if (parseInt(preda.style.top) < parseInt(minacciaPiuVicina.style.top)) {
+                    nuovaPosizioneY = nuovaPosizioneY - passo; // Si allontana invece di avvicinarsi
+                    preda.setAttribute("direzione", "N");
+                    RefreshImmagineSprite(preda.id);
+                }
+                if (parseInt(preda.style.top) > parseInt(minacciaPiuVicina.style.top)) {
+                    nuovaPosizioneY = nuovaPosizioneY + passo; // Si allontana invece di avvicinarsi
+                    preda.setAttribute("direzione", "S");
+                    RefreshImmagineSprite(preda.id);
+                }
+            }
+
+            SpostaSprite(preda.id, nuovaPosizioneX, nuovaPosizioneY);
+        }
+    }
+
+    function AzioneGioco(intervalID) {
+        if (GLOBAL_STATUS !== "game") {
+            clearInterval(intervalID);
+        }
+        else {
+            var sprites = document.querySelectorAll('img.sprite');
+            sprites.forEach(function (sprite) {
+
+                var tipologia = sprite.getAttribute("tipologia");
+
+                if (tipologia == "pac") {
+                    if (NumeroCasuale(1, 3) == 1) {
+                        AllontanatiDallaMinaccia(sprite.id, "ghost", false);
+                        AvvicinatiAllObiettivo(sprite.id, "pill", false);
+                        AllontanatiDallaMinaccia(sprite.id, "ghost", false);
+                        AllontanatiDallaMinaccia(sprite.id, "ghost", false);
+                    }
+                    else {
+                        ScegliDirezione(sprite.id);
+                        RefreshImmagineSprite(sprite.id);
+                    }
+                    MuoviSprite(sprite.id);
+                    RilevaCollisionePac(sprite.id);
+                }
+
+                if (tipologia == "pac_rage") {
+                    if (NumeroCasuale(1, 25) == 1) {
+                        ScegliDirezione(sprite.id);
+                        RefreshImmagineSprite(sprite.id);
+                    }
+                    else if (NumeroCasuale(1, 4) == 1) {
+                        AvvicinatiAllObiettivo(sprite.id, "ghost", false);
+                    }
+                    MuoviSprite(sprite.id);
+                    RilevaCollisionePac(sprite.id);
+                    RilevaCollisionePacRage(sprite.id);
+                }
+
+                if (tipologia == "pac_froze") {
+                    MuoviSprite(sprite.id);
+                    CheckOutOfBounds(sprite.id);
+                }
+
+                if (tipologia.startsWith("ghost")) {
+                    if (NumeroCasuale(1, 3) == 1) {
+                        AvvicinatiAllObiettivo(sprite.id, "pac", true);
+                    }
+                    else {
+                        ScegliDirezione(sprite.id);
+                        RefreshImmagineSprite(sprite.id);
+                    }
+                    MuoviSprite(sprite.id);
+                    RilevaCollisioneGhost(sprite.id);
+                }
+
+            });
+        }
+        CheckGameStatus();
+        PuliziaErrori();
+    }
+
+    function PuliziaErrori() {
+        var pillElements = document.querySelectorAll('[tipologia^="pill"]');
+        pillElements.forEach(function (element) {
+            var rscValue = element.getAttribute('RSC');
+            if (rscValue && (rscValue.endsWith('_D') || rscValue.endsWith('_S'))) {
+                var modifiedRscValue = rscValue.slice(0, -2);
+                element.setAttribute('RSC', modifiedRscValue);
+            }
+        });
+    }
+
+    function CheckGameStatus() {
+        var pacs = document.querySelectorAll('img[tipologia^="pac"]');
+        var ghosts = document.querySelectorAll('img[tipologia^="ghost"]');
+        var pills = document.querySelectorAll('img[tipologia^="pill"]');
+
+        var countPacs = 0;
+        pacs.forEach(function (img) {
+            countPacs++;
+        });
+        document.getElementById("pacs").textContent = "Pacs " + countPacs.toString();
+
+        var countGhosts = 0;
+        ghosts.forEach(function (img) {
+            countGhosts++;
+        });
+        document.getElementById("ghosts").textContent = "Fantasmi " + countGhosts.toString();
+
+        var pills = document.querySelectorAll('img[tipologia^="pill"]');
+        var countPills = 0;
+        pills.forEach(function (img) {
+            countPills++;
+        });
+
+        if (countPills <= 5) {
+            CreaUnaPillola();
+        }
+
+        if (countPacs <= 0) {
+            Stop();
+            document.getElementById("immagineGioco").src = "GAMEOVER.png";
+            document.getElementById("TestoPunti").textContent = punti + " punti";
+        }
+
+        if (countGhosts <= 0) {
+            Stop();
+            document.getElementById("immagineGioco").src = "GAMEWIN.png";
+            document.getElementById("TestoPunti").textContent = punti + " punti";
+        }
+
+        document.getElementById("points").textContent = "Punti " + punti.toString();
+    }
+
+    function ScegliDirezione(id) {
+        var immagine = document.getElementById(id);
+
+        if (immagine) {
+            var direzione = NumeroCasuale(1, 8);
+
+            if (direzione == 1) {
+                immagine.setAttribute("direzione", "N");
+            }
+            else if (direzione == 2) {
+                immagine.setAttribute("direzione", "S");
+            }
+            else if (direzione == 3) {
+                immagine.setAttribute("direzione", "E");
+            }
+            else if (direzione == 4) {
+                immagine.setAttribute("direzione", "O");
+            }
+            if (direzione == 5) {
+                immagine.setAttribute("direzione", "NE");
+            }
+            else if (direzione == 6) {
+                immagine.setAttribute("direzione", "NO");
+            }
+            else if (direzione == 7) {
+                immagine.setAttribute("direzione", "SE");
+            }
+            else if (direzione == 8) {
+                immagine.setAttribute("direzione", "SO");
+            }
+
+            if (immagine.getAttribute("tipologia") == "pac_froze") {
+                immagine.setAttribute("direzione", "S");
+            }
+        }
+        RefreshImmagineSprite(id);
+    }
+
+    function RefreshImmagineSprite(id) {
+        var path = "";
+        var sprite = document.getElementById(id);
+
+        if (sprite) {
+            var tipologia = sprite.getAttribute("tipologia");
+            var direzione = sprite.getAttribute("direzione");
+
+            if (tipologia && !tipologia.startsWith("pill")) {
+                if (direzione == "E") {
+                    sprite.src = path + tipologia + "_D.png";
+                }
+                else if (direzione == "O") {
+                    sprite.src = path + tipologia + "_S.png";
+                }
+                else if (direzione == "N") {
+                    if (NumeroCasuale(1, 2) == 1) {
+                        sprite.src = path + tipologia + "_D.png";
+                    }
+                    else {
+                        sprite.src = path + tipologia + "_S.png";
+                    }
+                }
+                else if (direzione == "S") {
+                    if (NumeroCasuale(1, 2) == 1) {
+                        sprite.src = path + tipologia + "_D.png";
+                    }
+                    else {
+                        sprite.src = path + tipologia + "_S.png";
+                    }
+                }
+                else if (direzione == "NE") {
+                    sprite.src = path + tipologia + "_D.png";
+                }
+                else if (direzione == "NO") {
+                    sprite.src = path + tipologia + "_S.png";
+                }
+                else if (direzione == "SE") {
+                    sprite.src = path + tipologia + "_D.png";
+                }
+                else if (direzione == "SO") {
+                    sprite.src = path + tipologia + "_S.png";
+                }
+            }
+        }
+    }
+
+    function MuoviSprite(id) {
+        var immagine = document.getElementById(id);
+
+        if (immagine) {
+            var direzione = immagine.getAttribute("direzione");
+            var passo = NumeroCasuale(5, parseInt(immagine.getAttribute("maxPasso")));
+
+            var x = immagine.style.left.replace("px", "");
+            var y = immagine.style.top.replace("px", "");
+
+            if (direzione == "E") {
+                SpostaSprite(id, parseInt(x) + passo, parseInt(y));
+            }
+            else if (direzione == "O") {
+                SpostaSprite(id, parseInt(x) - passo, parseInt(y));
+            }
+            else if (direzione == "N") {
+                SpostaSprite(id, parseInt(x), parseInt(y) - passo);
+            }
+            else if (direzione == "S") {
+                SpostaSprite(id, parseInt(x), parseInt(y) + passo);
+            }
+            else if (direzione == "NE") {
+                passo = Math.floor(passo / 2);
+                SpostaSprite(id, parseInt(x) + passo, parseInt(y) - passo);
+            }
+            else if (direzione == "NO") {
+                passo = Math.floor(passo / 2);
+                SpostaSprite(id, parseInt(x) - passo, parseInt(y) - passo);
+            }
+            else if (direzione == "SE") {
+                passo = Math.floor(passo / 2);
+                SpostaSprite(id, parseInt(x) + passo, parseInt(y) + passo);
+            }
+            else if (direzione == "SO") {
+                passo = Math.floor(passo / 2);
+                SpostaSprite(id, parseInt(x) - passo, parseInt(y) + passo);
+            }
+        }
+    }
+
+    function AggiungiSprite(id, tipologia, x, y) {
+
+        //conta gli elementi già presenti della stessa tipologia
+
+        var parti = tipologia.split("_");
+        var tipologiaGenerale = parti[0];
+        var elementiGiaPresenti = document.querySelectorAll('img[tipologia^="' + tipologiaGenerale + '"]');
+        //console.log("elementiGiaPresenti " + tipologia + ": " + elementiGiaPresenti.length);
+
+        var count = 0;
+        elementiGiaPresenti.forEach(function (e) {
+            count++;
+        });
+
+        if (count <= 45) {
+            // Crea l'elemento img
+            var immagine = document.createElement("img");
+
+            // Imposta il percorso dell'immagine
+            immagine.id = id;
+            immagine.className = "sprite";
+            immagine.setAttribute("tipologia", tipologia);
+
+            //dimensioni del contenitore (ARENA)
+            var rect = arena.getBoundingClientRect();
+            var centerX = rect.left + rect.width / 2;
+            var centerY = rect.top + rect.height / 2;
+
+            var xCasualeMin = rect.left;
+            var xCasualeMax = rect.width - immagine.width;
+            var yCasualeMin = rect.top;
+            var yCasualeMax = rect.height - 125;
+
+            document.getElementById("arena").appendChild(immagine);
+
+            if (tipologia == "pac") {
+                immagine.width = "50";
+                immagine.setAttribute("maxPasso", "10");
+                ScegliDirezione(id);
+                RefreshImmagineSprite(id);
+            }
+            else if (tipologia == "pac_rage") {
+                immagine.width = "50";
+                immagine.setAttribute("maxPasso", "20");
+                ScegliDirezione(id);
+                RefreshImmagineSprite(id);
+            }
+            else if (tipologia.startsWith("ghost")) {
+                immagine.width = "50";
+                immagine.setAttribute("maxPasso", "5");
+                ScegliDirezione(id);
+                RefreshImmagineSprite(id);
+            }
+            else if (tipologia.startsWith("pill")) {
+                immagine.width = "25";
+                immagine.src = tipologia + ".png";
+            }
+
+            if ((x != null) && (y != null)) {
+                SpostaSprite(id, x, y);
+            }
+            else {
+                SpostaSprite(id, NumeroCasuale(xCasualeMin, xCasualeMax), NumeroCasuale(yCasualeMin, yCasualeMax));
+            }
+        }
+    }
+
+    function SpostaSprite(id, x, y) {
+        var arena = document.getElementById("arena");
+        var immagine = document.getElementById(id);
+
+        var limiteX = arena.offsetWidth - immagine.offsetWidth; // Calcola il limite sull'asse x
+        var limiteY = arena.offsetHeight - immagine.offsetHeight; // Calcola il limite sull'asse y
+
+        // Assicura che x non superi i limiti
+        if (x < 0) {
+            x = 0;
+            ScegliDirezione(id);
+        } else if (x > limiteX) {
+            x = limiteX;
+            ScegliDirezione(id);
+        }
+
+        // Assicura che y non superi i limiti
+        if (y < 0) {
+            y = 0;
+            ScegliDirezione(id);
+        } else if (y > limiteY) {
+            y = limiteY;
+            ScegliDirezione(id);
+        }
+
+        // Imposta le nuove coordinate
+        immagine.style.left = x + "px";
+        immagine.style.top = y + "px";
+
+        var direzione = immagine.getAttribute("direzione");
+    }
+
+    function Stop() {
+        GLOBAL_STATUS = "stop";
+        modal.style.display = 'block';
+    }
+
+    function CreaUnFantasma() {
+        var numeroCasuale = NumeroCasuale(1, 4);
+
+        if (numeroCasuale == 1) {
+            AggiungiSprite(GeneraGUID(), "ghost_blinky");
+        }
+        else if (numeroCasuale == 2) {
+            AggiungiSprite(GeneraGUID(), "ghost_clyde");
+        }
+        else if (numeroCasuale == 3) {
+            AggiungiSprite(GeneraGUID(), "ghost_inky");
+        }
+        else if (numeroCasuale == 4) {
+            AggiungiSprite(GeneraGUID(), "ghost_pinky");
+        }
+    }
+
+    function CreaUnaPillola() {
+        var numeroCasuale = NumeroCasuale(1, 4);
+
+        if (numeroCasuale == 1) {
+            AggiungiSprite(GeneraGUID(), "pill_pill");
+        }
+        else if (numeroCasuale == 2) {
+            AggiungiSprite(GeneraGUID(), "pill_double");
+        }
+        else if (numeroCasuale == 3) {
+            AggiungiSprite(GeneraGUID(), "pill_rage");
+        }
+        if (numeroCasuale == 4) {
+            AggiungiSprite(GeneraGUID(), "pill_ghost");
+        }
+    //    if (numeroCasuale == 4) {
+    //        AggiungiSprite(GeneraGUID(), "pill_freeze");
+    //    }
+    }
+
+    //al caricamento della pagina
+    document.addEventListener('DOMContentLoaded', function () {
+        modal = document.getElementById('modal');
+        closeBtn = document.getElementById('closeBtn');
+
+        closeBtn.addEventListener('click', function () {
+            modal.style.display = 'none';
+            ResetGame();       
+        });
+
+        ResetGame();
+    });
+</script>
+
+<body>
+
+    <div>
+        <span class="titolo">Pac Man Arena vers. 1.0</span> <span class="titolo" id="pacs"></span> <span class="titolo" id="ghosts"></span> <span class="titolo" id="points"></span>
+    </div>
+
+    <br />
+
+    <div id="arena" class="arena">
+
+    </div>
+
+    <div id="modal" class="modal">
+        <div class="modal-content" style="text-align:center;">
+            <img id="immagineGioco" width="300" height="130" />
+            <p style="font-size:35px; font-weight:normal;" id="TestoPunti"></p>
+            <button id="closeBtn">Riprova!</button>
+        </div>
+    </div>
+
+</body>
+</html>
+
+
